@@ -1,0 +1,77 @@
+html {
+  background: #fff;
+}
+
+.backfaceVisibility {
+  -webkit-backface-visibility: visible;
+  backface-visibility: visible;
+}
+/*list view items settings*/
+.thumbnailContainer{
+    text-align: center;
+    float: left;
+    width: 15%;
+}
+
+.bookAttributs{
+    float: right;
+    width: 85%;
+}
+
+.bookTitle{
+    font-weight: bold;
+}
+
+/*main background image*/
+.backgroundImage{
+    background-image: url('../img/background_image.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* map styles*/
+
+
+
+/* searchView Buttons */
+
+.searchButton{
+    background-image: url('../img/scan.png');
+    background-size: 80px 60px;
+    background-repeat: no-repeat;
+}
+
+.scannerButton{
+    background-image: url('../img/search.png');
+    background-size: 80px 60px;
+    background-repeat: no-repeat;
+}
+
+/*BookView - FavoritView*/
+
+.submitFavorit, .deleteFavorit{
+
+    background-size: 80px 60px;
+    background-repeat: no-repeat;
+    z-index: 4;
+    position: absolute;
+    left: 92%;
+    top: -50%;
+}
+
+.submitFavorit{
+    background-image: url('../img/rating_important.png');
+}
+
+.deleteFavorit{
+    background-image: url('../img/dumbster.png');
+}
+
+.mapButton{
+    background-image: url('../img/location_map.png');
+    background-size: 80px 60px;
+    background-repeat: no-repeat;
+    right: 5%;
+    buttom: 5%;
+}
+
