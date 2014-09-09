@@ -72,23 +72,30 @@ define([
 
         function _getUserMedia() {
 
-            var videoSource = MediaStreamTrack.getSources(function(sourceInfos) {
-                var audioSource = null;
-                var videoSource = null;
+            if (typeof MediaStreamTrack === 'undefined'){
+                alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
+            } else {
 
-                for (var i = 0; i != sourceInfos.length; ++i) {
-                    var sourceInfo = sourceInfos[i];
+                var videoSource = MediaStreamTrack.getSources(function (sourceInfos) {
+                    console.log(sourceInfos);
+                    var videoSource = null;
 
-                    if (sourceInfo.kind === 'video') {
-                        console.log(sourceInfo.id, sourceInfo.label || 'camera');
+                    for (var i = 0; i != sourceInfos.length; ++i) {
+                        var sourceInfo = sourceInfos[i];
 
-                        videoSource = sourceInfo.id;
-                        return videoSource;
-                    } else {
-                        console.log('Some other kind of source: ', sourceInfo);
+                        if (sourceInfo.kind === 'video') {
+                            console.log(sourceInfo.id, sourceInfo.label || 'camera');
+
+                            if(sourceInfo.facing === 'environment') {
+                                videoSource = sourceInfo.id;
+                                return videoSource;
+                            }
+                        } else {
+                            console.log('Some other kind of source: ', sourceInfo);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             console.log(videoSource);
 
