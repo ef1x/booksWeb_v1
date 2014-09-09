@@ -109,16 +109,15 @@ define(['require',
         };
 
         FavoritCollection.prototype.setFavorites = function(book) {
-            console.log(book);
-
-            var storeObject = { title: book.getTitle(), authors: book.getAuthors(), identifier: book.getIdentifier(), description: book.getDescription(), thumbnail: book.getThumbnail()};
+            console.log(book.getblobURL());
+            var storeObject = { title: book.getTitle(), authors: book.getAuthors(), identifier: book.getIdentifier(), description: book.getDescription(), thumbnail: book.getblobURL()};
 
             // Store values in the newly created objectStore.
             var FavoritObjectStore = db.transaction(DB_STORE_NAME, 'readwrite');
             FavoritObjectStore.objectStore(DB_STORE_NAME).add(storeObject);
             FavoritObjectStore.oncomplete = function(event) {
                 console.log('record');
-                EventBus.emit('favorites:load');
+                EventBus.emit('favorites:loadData');
             };
 
         };

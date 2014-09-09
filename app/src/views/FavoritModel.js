@@ -3,7 +3,7 @@
  */
 define(function(require, exports, module) {
     function FavoritModel(favorit) {
-        // console.log(favorit);
+        console.log(favorit);
         this.id = favorit.key;
         var volumeInfo = favorit.value;
         //console.log(volumeInfo);
@@ -11,7 +11,7 @@ define(function(require, exports, module) {
         this.authors = volumeInfo.authors ? volumeInfo.authors : '';
         this.identifier = volumeInfo.identifier ? volumeInfo.identifier : '';
         this.description = volumeInfo.description ? volumeInfo.description : '';
-        this.imageLinks = volumeInfo.imageLinks ? volumeInfo.imageLinks : '';
+        this.thumbnail = volumeInfo.thumbnail ? volumeInfo.thumbnail : '';
 
         //this.identifier = volumeInfo.industryIdentifiers[0].identifier ? volumeInfo.industryIdentifiers[0].identifier :'';
         //this.description = volumeInfo.description ? volumeInfo.description :'';
@@ -42,20 +42,7 @@ define(function(require, exports, module) {
     };
 
     FavoritModel.prototype.getThumbnailUrl = function() {
-        if (typeof(this.imageLinks) == 'undefined')
-            return 'img/hamburger.png';
-
-        if (typeof(this.imageLinks.smallThumbnail) !== 'undefined')
-            return this.imageLinks.smallThumbnail;
-
-        if (typeof(this.imageLinks.thumbnail) !== 'undefined')
-            return this.imageLinks.thumbnail;
-
-        if (typeof(this.imageLinks.small) !== 'undefined')
-            return this.imageLinks.small;
-
-        if (typeof(this.imageLinks.medium) !== 'undefined')
-            return this.imageLinks.medium;
+        return this.thumbnail;
     };
 
     module.exports = FavoritModel;

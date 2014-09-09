@@ -35,6 +35,8 @@ define(['require',
 
         var surfaces = [];
 
+        console.log(Favorit.getThumbnailUrl());
+
         content = '<div class="favorit-item">';
         content += '<img class="favorit-icon" width="30" src="' + Favorit.getThumbnailUrl() + '" />';
         content += '<div class="favorit-title">' + Favorit.getTitle() + '</div>';

@@ -20,18 +20,13 @@ define(['require',
             //console.log(Book);
             View.apply(this, arguments);
             //console.log(Book.getThumbnail());
-            var thumbnail = Book.getThumbnail();
-            console.log('blobURL' + thumbnail);
+            Book.getThumbnail();
 
-//            content = '<div class="list-item">';
-            //content += '<img class="list-icon" width="30" src="' + Book.getThumbnail() + '" />';
-            content = '<div class="thumbnailContainer"><img src="data:image/*;base64,' + thumbnail +' "/></div>';
+            content = '<div id="thumbnailContainer'+ Book.getId() +'"></div>';
             content += '<div class="bookAttributs">';
             content += '<div class="bookTitle">' + Book.getTitle() + '</div>';
             content += '<div class="bookAuthors">' + Book.getAuthors() + '</div>';
             content += '<div class="bookIdentifier">' + Book.getIdentifier() + '</div></div>';
-//            content += '</div>';
-
 
             var surface = new Surface({
                 size: [undefined, this.options.listItemHeight],
@@ -43,8 +38,6 @@ define(['require',
                 }
 
             });
-
-
 //
             surface.pipe(this._eventOutput);
             this.add(surface);

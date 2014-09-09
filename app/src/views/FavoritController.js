@@ -60,7 +60,7 @@ define(['require',
 
         function _setFavorites(book) {
             this.favorit.setFavorites(book);
-            console.log(book);
+
         }
 
         function _deleteFavorites(Favorit) {

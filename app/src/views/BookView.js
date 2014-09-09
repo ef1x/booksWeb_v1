@@ -32,8 +32,10 @@ define(['require',
 
         var surfaces = [];
 
+
+
         content = '<div class="book-item">';
-        content += '<img class="book-icon" width="30" src="' + this.Book.getThumbnail() + '" />';
+        content += '<div id="thumbnailContainer'+ this.Book.getId() +'"><img src="'+ Book.getblobURL() +'"/></div>';
         content += '<div class="book-title">' + this.Book.getTitle() + '</div>';
         content += '<div class="book-authors">' + this.Book.getAuthors() + '</div>';
         content += '<div class="book-identifier">' + this.Book.getIdentifier() + '</div>';
@@ -80,7 +82,7 @@ define(['require',
     BookView.DEFAULT_OPTIONS = {};
 
     BookView.prototype.writeToDatabase = function() {
-
+        //console.log(this.blobURL);
         EventBus.emit('bookView:markAsFavorite', this.Book);
         //console.log(this.Book);
         console.log('emit markAsFavorite');
