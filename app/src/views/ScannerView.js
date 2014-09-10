@@ -11,92 +11,125 @@ define([
         var Surface = require('famous/core/Surface');
         var SubmitInputSurface = require('famous/surfaces/SubmitInputSurface');
 
+        var DecodeWorker = new Worker("../src/views/DecoderWorker.js");
+        DecodeWorker.onmessage = receiveMessage;
+
         function ScannerView() {
             View.apply(this, arguments);
-
-            string = '<div>test</div>';
             //string += '<p><input type=button value='&#x1F4F7;' onclick='snapshot()'>';
-            string += '<video id="video"></video>';
+            string = '<video id="video" width="360" ></video>';
             string += '<canvas id="canvas"></canvas>';
-            string += '<div id="photo"></div>';
+            string += '<div><img id="photo"/></div>';
 
             this.search = new Surface({
                 content: string
-
             });
 
-//            this.photo = new SubmitInputSurface({
-//                size: [300, 40],
-//                value: 'photo'
-//            });
-
             this.add(this.search);
-//            this.add(this.photo);
 
             this.search.on('click', function(ev) {
                 takepicture();
                 ev.preventDefault();
             });
 
-            _getUserMedia();
+            _selectSource();
         }
 
         function takepicture() {
-            canvas.width = 300;
-            canvas.height = 300;
+
+            //showPicture = document.getElementById('photo');
+            canvas.width = 360;
+            canvas.height = 270;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
             console.log(canvas);
             var data = canvas.toDataURL('image/png');
-            photo.setAttribute('src', data);
+            //photo.setAttribute('src', data);
+            //showPicture.src = data;
             console.log(data);
             DecodeBar(canvas);
         }
 
-        function DecodeBar(canvas) {
-            var DecodeWorker = new Worker("../src/views/DecoderWorker.js");
-            ctx = canvas.getContext('2d');
+        function DecodeBar(Canvas) {
+
+                ctx = canvas.getContext("2d");
+                //ctx = canvas.getContext('2d');
 //            canvas.width = 300;
 //            canvas.height = 300;
 //            showPicture.onload = function () {
-//                ctx.drawImage(showPicture,0,0,Canvas.width,Canvas.height);
+                ctx.drawImage(video,0,0,Canvas.width,Canvas.height);
 //                resultArray = [];
-//                workerCount = 2;
+                workerCount = 1;
 //                Result.innerHTML="";
-                DecodeWorker.postMessage({ImageData: ctx.getImageData(0, 0, canvas.width, canvas.height).data, Width: canvas.width, Height: canvas.height, cmd: "normal"});
-//            };
+                //var canvasImage = canvas.getContext('2d').drawImage(showPicture, 0, 0, canvas.width, canvas.height);
+                resultArray = [];
+                Result = alert('result');
+                //DecodeWorker.postMessage({ImageData: canvasImage, Width: canvas.width, Height: canvas.height, cmd: "normal", Decode: ["EAN-13"]});
+                DecodeWorker.postMessage({ImageData: ctx.getImageData(0,0,Canvas.width,Canvas.height).data, Width: Canvas.width, Height: Canvas.height, cmd: "normal",
+                    Decode: ["EAN-13"], Ean13Speed:false});
 
-            DecodeWorker.addEventListener('message', function(e) {
-                console.log('Worker said: ', e.data);
-            }, false);
+//                DecodeWorker.addEventListener('message', function (e) {
+//                    console.log('Worker said: ', e.data);
+//                }, false);
+
+                DecodeWorker.onmessage = receiveMessage;
+
         }
 
-        function _getUserMedia() {
-
-            if (typeof MediaStreamTrack === 'undefined'){
-                alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
-            } else {
-
-                var videoSource = MediaStreamTrack.getSources(function (sourceInfos) {
-                    console.log(sourceInfos);
-                    var videoSource = null;
-
-                    for (var i = 0; i != sourceInfos.length; ++i) {
-                        var sourceInfo = sourceInfos[i];
-
-                        if (sourceInfo.kind === 'video') {
-                            console.log(sourceInfo.id, sourceInfo.label || 'camera');
-
-                            if(sourceInfo.facing === 'environment') {
-                                videoSource = sourceInfo.id;
-                                return videoSource;
-                            }
-                        } else {
-                            console.log('Some other kind of source: ', sourceInfo);
-                        }
-                    }
-                });
+        function receiveMessage(e) {
+            if(e.data.success === "log") {
+                console.log(e.data.result);
+                return;
             }
+            if(e.data.finished) {
+                workerCount--;
+                if(workerCount) {
+                    if(resultArray.length == 0) {
+                        console.log('recive');
+                        DecodeWorker.postMessage({ImageData: ctx.getImageData(0,0,canvas.width,canvas.height).data, Width: canvas.width, Height: canvas.height, cmd: "right"});
+                    } else {
+                        workerCount--;
+                    }
+                }
+            }
+            if(e.data.success){
+                var tempArray = e.data.result;
+                for(var i = 0; i < tempArray.length; i++) {
+                    if(resultArray.indexOf(tempArray[i]) == -1) {
+                        resultArray.push(tempArray[i]);
+                    }
+                }
+                Result= alert(resultArray.join("<br />"));
+            }else{
+                if(resultArray.length === 0 && workerCount === 0) {
+                    Result =alert('failed') ;
+                }
+            }
+        }
 
+        function _selectSource() {
+
+            MediaStreamTrack.getSources(function (sourceInfos) {
+                var audioSource = null;
+                var videoSource = null;
+
+                for (var i = 0; i != sourceInfos.length; ++i) {
+                    var sourceInfo = sourceInfos[i];
+
+                    console.log(sourceInfo);
+
+                    if (sourceInfo.kind === 'video' && (sourceInfo.facing === 'environment' || sourceInfo.facing === '') ) {
+                        console.log(sourceInfo.id, sourceInfo.label || 'camera');
+
+                        videoSource = sourceInfo.id;
+                        _getUserMedia(videoSource);
+                    } else {
+                        console.log('Some other kind of source: ', sourceInfo);
+                    }
+                }
+            });
+        }
+
+        function _getUserMedia(videoSource) {
             console.log(videoSource);
 
             navigator.getUserMedia = (navigator.getUserMedia ||
@@ -104,18 +137,13 @@ define([
                 navigator.mozGetUserMedia ||
                 navigator.msGetUserMedia);
 
-            if (navigator.getUserMedia) {
-                navigator.getUserMedia(
-                    // constraints
-                    {
-                        video: true,
-                        optional: [
-                            {sourceId: videoSource}
-                        ]
-                    },
+            var constraints = {
+                video: {
+                    optional: [{sourceId: videoSource}]
+                }
+            };
+            navigator.getUserMedia(constraints, function(localMediaStream){
 
-                    // successCallback
-                    function(localMediaStream) {
                         var video = document.getElementById('video');
                         var canvas = document.getElementById('canvas');
                         var photo        = document.getElementById('photo');
@@ -131,12 +159,7 @@ define([
                     // errorCallback
                     function(err) {
                         console.log('The following error occured: ' + err);
-                    }
-                );
-            } else {
-                console.log('getUserMedia not supported');
-            }
-
+                    });
         }
 
         ScannerView.prototype = Object.create(View.prototype);

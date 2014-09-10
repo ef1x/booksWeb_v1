@@ -26,13 +26,12 @@ module.exports =  function (grunt) {
               '.tmp',
               '<%= config.app %>'
           ],
-
           middleware: function (connect, options, middlewares) {
             // inject a custom middleware
             middlewares.unshift(function (req, res, next) {
                 res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Access-Control-Allow-Methods', '*');
-                //a console.log('foo') here is helpful to see if it runs
+                res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+                console.log('foo');
                 return next();
             });
 
